@@ -1,9 +1,10 @@
+
 from app.youtube.transcript import extract_video_id, extract_transcript
 from app.youtube.combine import combine_transcript
 from app.youtube.chunking import create_chunks
 
-from app.vectorstore.ingest import store_documents
-from app.vectorstore.chroma import get_vector_store
+from app.vectorstore.ingest import ingest_documents
+from app.vectorstore.neon import get_vector_store
 
 
 video_url = "https://www.youtube.com/watch?v=376Ay_Lv-9o"
@@ -28,10 +29,10 @@ documents = create_chunks(
 for index, document in enumerate(documents):
     document.metadata["chunk_index"] = index
 
-# 5. Store documents in Chroma
-store_documents(documents, video_id)
+print("Total chunks created:", len(documents))
 
-# 6. Verify collection count
-vector_store = get_vector_store()
+# 5. Store documents in Neon
+stored_count = ingest_documents(documents, video_id)
 
-print("Total records:", vector_store._collection.count())
+print("Successfully stored:", stored_count)
+
