@@ -1,12 +1,10 @@
 
-# app/vectorstore/ingest.py
-
-from app.vectorstore.neon import get_vector_store
+from app.vectorstore.chroma import get_vector_store
 
 
 def ingest_documents(documents, video_id):
     """
-    Store transcript documents and their embeddings in Neon.
+    Store transcript documents and their embeddings in ChromaDB.
     """
 
     if not documents:
@@ -19,10 +17,14 @@ def ingest_documents(documents, video_id):
         for index in range(len(documents))
     ]
 
-    # Replace previously ingested chunks for this video.
-    # PGVector uses these IDs to identify the inserted documents.
+    # Delete previously ingested chunks for this video.
     vector_store.delete(ids=ids)
 
+    # Add globally unique document IDs to metadata.
+    for index, document in enumerate(documents):
+        document.metadata["document_id"] = ids[index]
+
+    # Store documents and generate embeddings.
     vector_store.add_documents(
         documents=documents,
         ids=ids

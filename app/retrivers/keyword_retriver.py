@@ -1,55 +1,47 @@
-import os
-import psycopg
 
-from dotenv import load_dotenv
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 
-load_dotenv()
-
-COLLECTION_NAME = "Yt_chatbot"
+from app.vectorstore.chroma import get_vector_store
 
 
 def keyword_search(query, k=5):
-
-    if not query.strip():
-        raise ValueError("Search query cannot be empty.")
-
-    database_url = os.getenv("NEON_DATABASE_URL")
-
-    if not database_url:
-        raise ValueError("NEON_DATABASE_URL is missing from .env")
-
-    search_query = """
-        SELECT
-            e.document,
-            e.cmetadata
-        FROM langchain_pg_embedding AS e
-        JOIN langchain_pg_collection AS c
-            ON e.collection_id = c.uuid
-        WHERE c.name = %s;
+    """
+    Perform keyword-based retrieval using BM25Retriever
+    with documents stored in ChromaDB.
     """
 
-    with psycopg.connect(database_url) as connection:
-        rows = connection.execute(
-            search_query,
-            (COLLECTION_NAME,)
-        ).fetchall()
+    if not query or not query.strip():
+        raise ValueError("Search query cannot be empty.")
+
+    # 1. Initialize Chroma vector store
+    vector_store = get_vector_store()
+
+    # 2. Fetch all stored documents from Chroma
+    stored_data = vector_store.get()
 
     documents = [
         Document(
-            page_content=row[0],
-            metadata=row[1] or {}
+            page_content=content,
+            metadata=metadata or {}
         )
-        for row in rows
+        for content, metadata in zip(
+            stored_data["documents"],
+            stored_data["metadatas"]
+        )
+        if content
     ]
 
     if not documents:
         return []
 
+    # 3. Build BM25 retriever
     retriever = BM25Retriever.from_documents(
         documents,
         k=k
     )
 
-    return retriever.invoke(query)
+    # 4. Retrieve keyword-relevant documents
+    results = retriever.invoke(query)
+
+    return results

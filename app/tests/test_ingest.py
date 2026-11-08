@@ -4,7 +4,7 @@ from app.youtube.combine import combine_transcript
 from app.youtube.chunking import create_chunks
 
 from app.vectorstore.ingest import ingest_documents
-from app.vectorstore.neon import get_vector_store
+from app.vectorstore.chroma import get_vector_store
 
 
 video_url = "https://www.youtube.com/watch?v=376Ay_Lv-9o"

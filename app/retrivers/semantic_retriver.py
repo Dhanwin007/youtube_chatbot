@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_classic.retrievers.multi_query import MultiQueryRetriever
 
-from app.vectorstore.neon import get_vector_store
+from app.vectorstore.chroma import get_vector_store
 
 
 load_dotenv()
@@ -22,7 +22,7 @@ def retrieve_documents(
     using MMR + MultiQueryRetriever.
     """
 
-    # 1. Initialize vector store
+    # 1. Initialize Chroma vector store
     vector_store = get_vector_store()
 
     # 2. Create MMR retriever
