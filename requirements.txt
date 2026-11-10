@@ -1,0 +1,22 @@
+
+# LangChain core and orchestration
+langchain-core
+langchain-classic
+langchain-community
+langchain-text-splitters
+
+# LangChain integrations
+langchain-groq
+langchain-chroma
+langchain-ollama
+langchain-cohere
+
+# Vector database and keyword retrieval
+chromadb
+rank-bm25
+
+# YouTube transcript extraction
+youtube-transcript-api
+
+# Environment configuration
+python-dotenv
